@@ -5,6 +5,20 @@ const {_} = require('lodash');
 const sqlite3 = require('sqlite3').verbose();
 const { DateTime } = require("luxon");
 
+const {
+    schemaVideo,
+    schemaVideoHost,
+    schemaPuzzle,
+    schemaPuzzleSetter,
+    schemaPuzzleSubtype,
+    schemaIndexes,
+    schemaAllPuzzles,
+    schemaSudokuPuzzles,
+    schemaGasPuzzles,
+    schemaPencilPuzzles,
+    schemaCrosswordPuzzles
+} = require("./db-schema");
+
 const CTC_CHANNEL_ID = 'UCC-UOdK8-mIjxBQm_ot1T-Q';
 var example = 'https://www.youtube.com/watch?v=_Fmp3dQYIss';
 var example2 = 'https://www.youtube.com/watch?v=AaC7ehqB3MI&t=30m55s';
@@ -87,92 +101,6 @@ const COL_GAS_DATE = 'GAS/GAPP Date';
 // 51: Sr. No.,4817
 const COL_SERIES_NUM = 'Sr. No.';
 
-const schemaVideoTable =
-`CREATE TABLE video (
-    id              TEXT NOT NULL,
-    title           TEXT NOT NULL,
-    video_type      TEXT NOT NULL,
-    super_category  TEXT NOT NULL,
-    date            TEXT NOT NULL,
-    length_seconds  INTEGER NOT NULL,
-    PRIMARY KEY(id)
-)`; // Note: STRICT schema is not supported by Datasette
-
-const schemaVideo = [
-    'DROP TABLE IF EXISTS video',
-    schemaVideoTable,
-    'CREATE INDEX video_video_type_idx1 ON video(video_type)',
-    'CREATE INDEX video_super_category_idx1 ON video(super_category)',
-    'CREATE INDEX video_date_idx1 ON video(date)'
-];
-
-const schemaVideoHostTable =
-`CREATE TABLE video_host(
-    video_id        TEXT NOT NULL,
-    host            TEXT NOT NULL,
-    PRIMARY KEY(video_id, host),
-    FOREIGN KEY(video_id) REFERENCES video(id)
-)`;
-
-const schemaVideoHost = [
-    'DROP TABLE IF EXISTS video_host',
-    schemaVideoHostTable,
-    'CREATE INDEX video_host_host_idx1 ON video_host(host)',
-];
-
-const schemaPuzzleTable =
-`CREATE TABLE puzzle(
-    id              INTEGER NOT NULL,
-    title           TEXT NOT NULL,
-    type            TEXT NOT NULL,
-    super_category  TEXT NOT NULL,
-    video_id        TEXT NOT NULL,
-    video_offset    TEXT,
-    source          TEXT,
-    collection      TEXT,
-    gas_date        TEXT,
-    PRIMARY KEY(id),
-    FOREIGN KEY(video_id) REFERENCES video(id)
-)`; // Note: STRICT schema is not supported by Datasette
-
-const schemaPuzzle = [
-    'DROP TABLE IF EXISTS puzzle',
-    schemaPuzzleTable,
-    'CREATE INDEX puzzle_type_idx1 ON puzzle(type)',
-    'CREATE INDEX puzzle_super_category_idx1 ON puzzle(super_category)',
-    'CREATE INDEX puzzle_source_idx1 ON puzzle(source)',
-    'CREATE INDEX puzzle_collection_idx1 ON puzzle(collection)'
-];
-
-const schemaPuzzleSubtypeTable =
-`CREATE TABLE puzzle_subtype(
-    puzzle_id       INTEGER NOT NULL,
-    subtype         TEXT NOT NULL,
-    PRIMARY KEY(puzzle_id, subtype),
-    FOREIGN KEY(puzzle_id) REFERENCES puzzle(id)
-)`;
-
-const schemaPuzzleSubtype = [
-    'DROP TABLE IF EXISTS puzzle_subtype',
-    schemaPuzzleSubtypeTable,
-    'CREATE INDEX puzzle_subtype_idx1 ON puzzle_subtype(subtype)'
-];
-
-const schemaPuzzleSetterTable =
-`CREATE TABLE puzzle_setter(
-    puzzle_id       INTEGER NOT NULL,
-    setter          TEXT NOT NULL,
-    aka             TEXT,
-    PRIMARY KEY(puzzle_id, setter),
-    FOREIGN KEY(puzzle_id) REFERENCES puzzle(id)
-)`;
-
-const schemaPuzzleSetter = [
-    'DROP TABLE IF EXISTS puzzle_setter',
-    schemaPuzzleSetterTable,
-    'CREATE INDEX puzzle_setter_setter_idx1 ON puzzle_setter(setter)'
-];
-
 const sheets = google.sheets({
     version: 'v4',
     auth: 'AIzaSyDv2qVtyomQ5KKnwgtyEPU7S4wVw0VObSA'
@@ -212,7 +140,7 @@ sheets.spreadsheets.values.get({
             _.forEach(schemaPuzzleSubtype, stmt => db.run(stmt));
             _.forEach(schemaPuzzleSetter, stmt => db.run(stmt));
 
-            const insertVideoStmt = db.prepare("INSERT INTO video VALUES (?,?,?,?,?,?)");
+            const insertVideoStmt = db.prepare("INSERT INTO video VALUES (?,?,?,?,?,?,?)");
             const insertVideoHostStmt = db.prepare("INSERT INTO video_host VALUES(?,?)");
             const insertPuzzleStmt = db.prepare("INSERT INTO puzzle VALUES(?,?,?,?,?,?,?,?,?)");
             const insertPuzzleSubtypeStmt = db.prepare("INSERT INTO puzzle_subtype VALUES(?,?)");
@@ -250,7 +178,8 @@ sheets.spreadsheets.values.get({
                                 record[COL_VIDEO_TYPE],
                                 record[COL_SUPER_CATEGORY],
                                 DateTime.fromFormat(record[COL_DATE], 'd-MMM-yyyy').toSQLDate(),
-                                record[COL_VIDEO_LENGTH_SEC]
+                                record[COL_VIDEO_LENGTH_SEC],
+                                record[COL_LINK_YT]
                             );
 
                             _.forEach(COLS_HOST, col => {
@@ -305,6 +234,20 @@ sheets.spreadsheets.values.get({
                         console.log("WARN: Unable to determine video id for " + record[COL_LINK_YT]);
                     }  
                 });
+
+                // Create schema indexes last, so the indexes don't need to be
+                // updated for every insert while populating the database
+                _.forEach(schemaIndexes, stmt => db.run(stmt));
+
+                // Create views
+                _.forEach(schemaAllPuzzles, stmt => db.run(stmt));
+
+                // Create tables (materialized from views)
+                _.forEach(schemaSudokuPuzzles, stmt => db.run(stmt));
+                _.forEach(schemaGasPuzzles, stmt => db.run(stmt));
+                _.forEach(schemaPencilPuzzles, stmt => db.run(stmt));
+                _.forEach(schemaCrosswordPuzzles, stmt => db.run(stmt));
+
             } finally {
                 insertVideoStmt.finalize();
                 insertVideoHostStmt.finalize();
