@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # Project specific exclusions
-youtube-api/db/ctc-catalogue.db
+build-ctc-db/db/ctc-catalogue.db
