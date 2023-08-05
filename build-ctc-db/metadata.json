@@ -1,0 +1,56 @@
+{
+    "title": "Cracking the Cryptic Catalogue",
+    "description_html": "This is a <strong>fan-created catalogue</strong> of all video <strong>content</strong> released by Cracking the Cryptic on its <a href='https://www.youtube.com/channel/UCC-UOdK8-mIjxBQm_ot1T-Q'><strong>Youtube</strong> channel</a> over the years.",
+    "source": "Cracking the Cryptic Catalogue",
+    "source_url": "https://docs.google.com/spreadsheets/d/1rVqAjm-l_Urjd3TNmIc3SmTmz_OlgSoBuhY7RPgiuRg/edit?usp=sharing",
+
+    "databases": {
+        "ctc-catalogue": {
+            "tables": {
+                "puzzle_setter": {
+                    "hidden": true
+                },
+                "puzzle_subtype": {
+                    "hidden": true
+                },
+                "video_host": {
+                    "hidden": true
+                },
+                "puzzle": {
+                    "hidden": true
+                },
+                "video": {
+                    "hidden": true
+                },
+                "sudoku_puzzles": {
+                    "description": "Sudoku puzzle-solving videos from CTC.",
+                    "sort_desc": "Id",
+                    "units": {
+                        "Video Length (Minutes)": "minute"
+                    }
+                },
+                "gas_puzzles": {
+                    "description_html": "<em>Genuinely Approachable Sudoku</em> (GAS) puzzle-solving videos from CTC.",
+                    "sort_desc": "Id",
+                    "units": {
+                        "Video Length (Minutes)": "minute"
+                    }
+                },
+                "crossword_puzzles": {
+                    "description": "Crossword puzzle-solving videos from CTC.",
+                    "sort_desc": "Id",
+                    "units": {
+                        "Video Length (Minutes)": "minute"
+                    }
+                },
+                "pencil_puzzles": {
+                    "description": "Pencil puzzle-solving (excluding sudoku) videos from CTC.",
+                    "sort_desc": "Id",
+                    "units": {
+                        "Video Length (Minutes)": "minute"
+                    }
+                }
+            }
+        }
+    }
+}
