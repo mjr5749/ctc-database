@@ -111,7 +111,9 @@ select
   (select json_group_array(setter) from puzzle_setter where puzzle_id=pz.id group by puzzle_id) "Setter",
   (select json_group_array(subtype) from puzzle_subtype where puzzle_id=pz.id group by puzzle_id) "Constraints",
   json_object(
-    'label',vid.title,
+    'alt',vid.title,
+    'caption',vid.title,
+    'img_src', 'https://img.youtube.com/vi/' || vid.id|| '/mqdefault.jpg',
     'href',CASE ifnull(pz.video_offset, '') WHEN '' THEN vid.youtube_link ELSE vid.youtube_link || '&t=' || pz.video_offset END
   ) "Video",
   time(vid.length_seconds, 'unixepoch') "Video Length",
