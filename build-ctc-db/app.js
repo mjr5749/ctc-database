@@ -103,7 +103,7 @@ const COL_SERIES_NUM = 'Sr. No.';
 
 const sheets = google.sheets({
     version: 'v4',
-    auth: 'AIzaSyDv2qVtyomQ5KKnwgtyEPU7S4wVw0VObSA'
+    auth: process.env.GOOGLE_SHEETS_API_KEY
 });
 
 sheets.spreadsheets.values.get({
@@ -263,60 +263,3 @@ sheets.spreadsheets.values.get({
         console.log(reason);
     }
 );
-
-// Each API may support multiple versions. With this sample, we're getting
-// v3 of the blogger API, and using an API key to authenticate.
-/*
-const youtube = google.youtube({
-    version: 'v3',
-    auth: 'AIzaSyBk54CrEfJONewTd2ORrj-mSP93wWN7RJk'
-});
-
-youtube.videos.list({
-    part: 'statistics',
-    id: '_Fmp3dQYIss'
-}, function (err, response) {
-    if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
-    }
-    console.log(response.data.items[0]);
-});
-*/
-
-/*
-youtube.search.list({
-    part: 'snippet',
-    type: 'channel',
-    q: 'Cracking The Cryptic'
-}, function (err, response) {
-    if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
-    }
-    console.log(response.data.items[0]);
-});
-*/
-
-/*
-youtube.channels.list({
-    part: 'id', //'snippet,contentDetails,statistics',
-    forUsername: 'CrackingTheCryptic'
-}, function (err, response) {
-    if (err) {
-        console.log('The API returned an error: ' + err);
-        return;
-    }
-    console.log(response);
-    var channels = response.data.items;
-    if (channels.length == 0) {
-        console.log('No channel found.');
-    } else {
-        console.log('This channel\'s ID is %s. Its title is \'%s\', and ' +
-            'it has %s views.',
-            channels[0].id,
-            channels[0].snippet.title,
-            channels[0].statistics.viewCount);
-    }
-});
-*/
