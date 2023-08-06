@@ -1,6 +1,10 @@
 on:
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: build-ctc-db
+    
 jobs:
   deploy_fly_io:
     name: deploy to fly.io
