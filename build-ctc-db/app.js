@@ -260,6 +260,7 @@ sheets.spreadsheets.values.get({
         
     },
     function onRejected(reason) {
-        console.log(reason);
+        console.error('FATAL: Error returned from Google Sheets API: ' + reason);
+        process.exit(1);
     }
 );
