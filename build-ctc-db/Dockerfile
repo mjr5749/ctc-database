@@ -9,7 +9,7 @@ RUN ["datasette", "install", "datasette-json-html"]
 COPY ./db/ctc-catalogue.db /db/ctc-catalogue.db
 
 # Add Datasette metadata file
-COPY ./metadata.json /db/metadata.json
+COPY ./db/metadata.json /db/metadata.json
 
 # Default command to run Datasette
 CMD ["datasette", "-p", "8080", "-h", "0.0.0.0", "/db/ctc-catalogue.db", \
