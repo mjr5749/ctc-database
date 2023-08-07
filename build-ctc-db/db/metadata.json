@@ -27,28 +27,49 @@
                     "sort_desc": "Id",
                     "units": {
                         "Video Length (Minutes)": "minute"
-                    }
+                    },
+                    "facets": [
+                        {"array": "Solver"},
+                        {"array": "Setter"},
+                        {"array": "Constraints"}
+                    ]
                 },
                 "gas_puzzles": {
                     "description_html": "<em>Genuinely Approachable Sudoku</em> (GAS) puzzle-solving videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
                         "Video Length (Minutes)": "minute"
-                    }
+                    },
+                    "facets": [
+                        {"array": "Solver"},
+                        {"array": "Setter"},
+                        {"array": "Constraints"}
+                    ]
                 },
                 "crossword_puzzles": {
                     "description": "Crossword puzzle-solving videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
                         "Video Length (Minutes)": "minute"
-                    }
+                    },
+                    "facets": [
+                        {"array": "Solver"},
+                        {"array": "Setter"},
+                        {"array": "Constraints"}
+                    ]
                 },
                 "pencil_puzzles": {
                     "description": "Pencil puzzle-solving (excluding sudoku) videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
                         "Video Length (Minutes)": "minute"
-                    }
+                    },
+                    "facets": [
+                        "Type",
+                        {"array": "Solver"},
+                        {"array": "Setter"},
+                        {"array": "Constraints"}
+                    ]
                 }
             }
         }
