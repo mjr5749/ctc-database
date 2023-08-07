@@ -92,6 +92,7 @@ module.exports.schemaIndexes = [
     'CREATE INDEX puzzle_setter_setter_idx1 ON puzzle_setter(setter)'
 ];
 
+// YouTube Image Thumbnails: https://stackoverflow.com/questions/2068344/how-do-i-get-a-youtube-video-thumbnail-from-the-youtube-api
 const schemaAllPuzzlesView = 
 `CREATE VIEW all_puzzles AS
 select
