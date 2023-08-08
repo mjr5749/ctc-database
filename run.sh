@@ -1,7 +1,7 @@
 #!/bin/bash
 
-docker build -t ctc-catalogue ./build-ctc-db/
-docker run -p 8080:8080 ctc-catalogue
+docker build --build-arg="DATASETTE_FORCE_HTTPS_URLS=0" -t ctc-catalogue ./build-ctc-db/
+docker run -t -i -p 8080:8080 ctc-catalogue
 
 #docker run -p 8001:8001 -v `pwd`:/mnt \
 #    datasetteproject/datasette \
