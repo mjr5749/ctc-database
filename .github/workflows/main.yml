@@ -1,5 +1,10 @@
 on:
   workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Run daily at 3:33 UTC (11:33 PM EST)
+    - cron:  '33 3 * * *'
+  
 
 defaults:
   run:
