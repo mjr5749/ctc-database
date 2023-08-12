@@ -10,6 +10,9 @@ ARG DATASETTE_FORCE_HTTPS_URLS=1
 RUN ["datasette", "install", "datasette-json-html"]
 RUN ["datasette", "install", "datasette-hashed-urls"]
 
+# Copy custom Datasette plugins
+COPY ./plugins /plugins
+
 # Add database of CTC Catalogue
 COPY ./db/ctc-catalogue.db /db/ctc-catalogue.db
 
@@ -22,6 +25,7 @@ ENV DATASETTE_FORCE_HTTPS_URLS=${DATASETTE_FORCE_HTTPS_URLS}
 # Default command to run Datasette
 CMD datasette -p 8080 -h 0.0.0.0 -i /db/ctc-catalogue.db \
     --metadata /db/metadata.json \
+    --plugins-dir /plugins \
     --setting facet_time_limit_ms 200 \
     --setting default_facet_size 25 \
     --setting suggest_facets off \
