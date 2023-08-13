@@ -23,6 +23,7 @@
                     "hidden": true
                 },
                 "sudoku_puzzles": {
+                    "title": "🔢 Sudoku Puzzles",
                     "description": "Sudoku puzzle-solving videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
@@ -35,6 +36,7 @@
                     ]
                 },
                 "gas_puzzles": {
+                    "title": "⛽️ Genuinely Approachable Sudoku (GAS) Puzzles",
                     "description_html": "<em>Genuinely Approachable Sudoku</em> (GAS) puzzle-solving videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
@@ -47,6 +49,7 @@
                     ]
                 },
                 "crossword_puzzles": {
+                    "title": "🔠 Crossword Puzzles",
                     "description": "Crossword puzzle-solving videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
@@ -59,6 +62,7 @@
                     ]
                 },
                 "pencil_puzzles": {
+                    "title": "✏️ Pencil Puzzles",
                     "description": "Pencil puzzle-solving (excluding sudoku) videos from CTC.",
                     "sort_desc": "Id",
                     "units": {
