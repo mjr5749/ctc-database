@@ -35,7 +35,11 @@
         }
     </script>
 
-    {% for facet_info in sorted_facet_results %}
+    {# Use facet_results.values() instead of sorted_facet results. This prevents the ordering of the vertical
+       columns from changing while navigating within a single table. Anecdotally, this appears to return the
+       facets in the order they are defined in the metadata.json file.
+    #}
+    {% for facet_info in facet_results.values() %}
         <div class="facet-info facet-{{ database|to_css_class }}-{{ table|to_css_class }}-{{ facet_info.name|to_css_class }}" id="facet-{{ facet_info.name|to_css_class }}" data-column="{{ facet_info.name }}">
             <p class="facet-info-name">
                 <strong>{{ facet_info.name }}{% if facet_info.type != "column" %} ({{ facet_info.type }}){% endif %}
@@ -61,7 +65,7 @@
                     {% endif %}
                 {% endfor %}
 
-                <li>
+                <li id="facet-{{ facet_info.name|to_css_class }}-input-li">
                     <input 
                         list="facet-{{ facet_info.name|to_css_class }}-datalist" 
                         id="facet-{{ facet_info.name|to_css_class }}-input" 
@@ -82,13 +86,24 @@
             </ul>
 
             <script defer>
+            {
+                // Listen for input changes on the input field, and react whenever an
+                // option from the datalist has been entered or selected.
                 document.getElementById(
                     "facet-{{ facet_info.name|to_css_class }}-input"
                 ).addEventListener(
                     'input', 
                     facetInputDebounce(onFacetInput("facet-{{ facet_info.name|to_css_class }}"), 200));
 
-                // TODO: Hide search input if list is empty
+                // Hide search input if list is empty.
+                let datalist = document.getElementById("facet-{{ facet_info.name|to_css_class }}-datalist");
+                if (datalist.children.length == 0) {
+                    // Get the list item (li) containing the input field and hide it
+                    document.getElementById(
+                        "facet-{{ facet_info.name|to_css_class }}-input-li"
+                    ).style.display = "none";
+                }
+            }
             </script>
 
         </div>
