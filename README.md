@@ -1,11 +1,11 @@
-This project implements a web-based interface for the Cracking the Cryptic (CTC) catalogue of YouTube videos. The source of this data is the fan-created [Cracking the Cryptic Catalogue]("https://docs.google.com/spreadsheets/d/1rVqAjm-l_Urjd3TNmIc3SmTmz_OlgSoBuhY7RPgiuRg/edit?usp=sharing").
+This project implements a web-based interface for the Cracking the Cryptic (CTC) catalogue of YouTube videos. The source of this data is the fan-created [Cracking the Cryptic Catalogue](https://docs.google.com/spreadsheets/d/1rVqAjm-l_Urjd3TNmIc3SmTmz_OlgSoBuhY7RPgiuRg/edit?usp=sharing).
 
 The [Datasette](https://datasette.io) tool is used to provide the interactive web interface for the catalogue database.
 
 The high-level components of this application are:
 1. The `build-ctc-db` sub-project is a Node.js project that loads the Google Sheets version of the [Cracking the Cryptic Catalogue]("https://docs.google.com/spreadsheets/d/1rVqAjm-l_Urjd3TNmIc3SmTmz_OlgSoBuhY7RPgiuRg/edit?usp=sharing") into a [SQLite](https://www.sqlite.org/index.html) database.
 2. The `build-ctc-db` sub-project packages the resulting SQLite database and a customized Datasette configuration into a Docker image.
-3. The Docker image is hosted as an app on the [fly.io](fly.io) platform.
+3. The Docker image is deployed on the [fly.io](fly.io) platform.
 4. The [ctc-catalogue.com website](https://ctc-catalogue.com) is hosted on Cloudflare to provide DNS and caching services in front of the fly.io app.
 
 # Deplyment Details
@@ -30,11 +30,11 @@ Because the Datasette database is read-only, dynamic content rendered by Dataset
 
 The application is deployed as a single Docker container on the Fly.io platform, with a single node in each of 3 geographic regions. The Docker image contains both the Datasette utility, and the SQLite database containing the catalogue.
 
-The app is configured with a custom domain and certificate for `ctc-catalogue.com`. This allows Cloudflare to communicate with the app using the `Full (Strict)` TLS mode..y
+The app is configured with a custom domain and certificate for `ctc-catalogue.com`. This allows Cloudflare to communicate with the app using the `Full (Strict)` TLS mode.
 
 ### Deploying with Github Actions
 
-The application is deployed to fly.io by GitHub Actions scheduled on a trigger. The action builds an up-to-date SQLite database of the catalogue, creates the Docker image, and deploys to the fly.io app.
+The application is deployed to fly.io by GitHub Actions scheduled on a trigger. The action builds an up-to-date SQLite database of the catalogue, creates the Docker image, and deploys to fly.io.
 
 The GitHub action, `deploy_fly_io` is defined in:
 > .github/workflows/main.yml
@@ -47,13 +47,13 @@ The Datasette application has been configured to provide custom content, to fine
 
 The Datasette `metadata.json` file provides friendly table names, descriptions, and data sources for this project.
 
-The home page template -- `templates\index.html` -- has been customized to provide details about the project and to provide links into the main tables of interest to users.
+The home page template -- `templates\index.html` -- has been customized to provide details about the project and to provide links directly to the main tables of interest to users.
 
 ## Datasette UX Adjustments
 
 The Datasette `datasette-json-html` plugin is used to render images and hyperlinks inline in the table data views. This allows the YouTube video thumbnails to be shown directly inline in the catalogue.
 
-A custom plugin -- `plugins\render_cell_json_array.py` -- is used to pretty-print JSON string arrays.
+A custom plugin -- `plugins\render_cell_json_array.py` -- is used to pretty-print JSON string arrays. This changes the default behavior for displaying these arrays as shown here:
 * Default behavior: `["Element 1", "Element 2", ...]`
 * Custom behavior:  `Element 1, Element 2, ...`
 
