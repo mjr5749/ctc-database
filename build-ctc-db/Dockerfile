@@ -22,11 +22,16 @@ COPY ./db/ctc-catalogue.db /db/ctc-catalogue.db
 # Add Datasette metadata file
 COPY ./db/metadata.json /db/metadata.json
 
+# Pre-calculate row counts
+RUN  ["datasette", "inspect", "/db/ctc-catalogue.db", \
+      "--inspect-file=/db/inspect.json"]
+
 # Capture build argument that we need when launching Datasette
 ENV DATASETTE_FORCE_HTTPS_URLS=${DATASETTE_FORCE_HTTPS_URLS}
 
 # Default command to run Datasette
 CMD datasette -p 8080 -h 0.0.0.0 -i /db/ctc-catalogue.db \
+    --inspect-file=/db/inspect.json \
     --metadata /db/metadata.json \
     --plugins-dir /plugins \
     --template-dir /templates \
