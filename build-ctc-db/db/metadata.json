@@ -33,7 +33,8 @@
                         {"array": "Solver"},
                         {"array": "Setter"},
                         {"array": "Constraints"}
-                    ]
+                    ],
+                    "facet_size": 1200
                 },
                 "gas_puzzles": {
                     "title": "⛽️ Genuinely Approachable Sudoku (GAS) Puzzles",
@@ -46,7 +47,8 @@
                         {"array": "Solver"},
                         {"array": "Setter"},
                         {"array": "Constraints"}
-                    ]
+                    ],
+                    "facet_size": 1200
                 },
                 "crossword_puzzles": {
                     "title": "🔠 Crossword Puzzles",
@@ -59,7 +61,8 @@
                         {"array": "Solver"},
                         {"array": "Setter"},
                         {"array": "Constraints"}
-                    ]
+                    ],
+                    "facet_size": 1200
                 },
                 "pencil_puzzles": {
                     "title": "✏️ Pencil Puzzles",
@@ -73,7 +76,8 @@
                         {"array": "Solver"},
                         {"array": "Setter"},
                         {"array": "Constraints"}
-                    ]
+                    ],
+                    "facet_size": 1200
                 }
             }
         }

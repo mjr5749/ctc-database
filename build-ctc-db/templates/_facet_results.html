@@ -1,0 +1,96 @@
+<div class="facet-results">
+    <script>
+        // TODO: Consider moving Javascript out of the template
+
+        const facetInputDebounce = (callback, wait) => {
+            let timeoutId = null;
+            return (...args) => {
+                window.clearTimeout(timeoutId);
+                timeoutId = window.setTimeout(() => {
+                callback.apply(null, args);
+                }, wait);
+            };
+        }
+
+        function onFacetInput(facet){
+            return (e) => {
+                var input = e.target,
+                    val = input.value;
+                    list = input.getAttribute('list'),
+                    options = document.getElementById(list).children;
+
+                for(var i = 0; i < options.length; i++) {
+                    if(options[i].value === val) {
+                        // Selected item matches a value
+                        // in the list of options
+                        // console.log('item selected: ' + val + ', ' + i);
+                        
+                        link = document.getElementById(options[i].dataset.item);
+                        link.style.display = "list-item";
+
+                        break;
+                    }
+                }
+            }
+        }
+    </script>
+
+    {% for facet_info in sorted_facet_results %}
+        <div class="facet-info facet-{{ database|to_css_class }}-{{ table|to_css_class }}-{{ facet_info.name|to_css_class }}" id="facet-{{ facet_info.name|to_css_class }}" data-column="{{ facet_info.name }}">
+            <p class="facet-info-name">
+                <strong>{{ facet_info.name }}{% if facet_info.type != "column" %} ({{ facet_info.type }}){% endif %}
+                    <span class="facet-info-total">{% if facet_info.truncated %}&gt;{% endif %}{{ facet_info.results|length }}</span>
+                </strong>
+                {% if facet_info.hideable %}
+                    <a href="{{ facet_info.toggle_url }}" class="cross">&#x2716;</a>
+                {% endif %}
+            </p>
+
+            <ul class="tight-bullets">
+                {% for facet_value in facet_info.results %}
+                    {% if facet_value.selected %}
+                        <li>{{ facet_value.label or "-" }} &middot; {{ "{:,}".format(facet_value.count) }} <a href="{{ facet_value.toggle_url }}" class="cross">&#x2716;</a></li>
+                    {% else %}
+                        <li 
+                            {% if loop.index0 >= 5 %}
+                                style="display: none"
+                            {% endif %}
+                            id="facet-{{ facet_info.name|to_css_class }}-item-{{loop.index0}}">
+                            <a href="{{ facet_value.toggle_url }}">{{ (facet_value.label | string()) or "-" }}</a> &middot; {{ "{:,}".format(facet_value.count) }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <li>
+                    <input 
+                        list="facet-{{ facet_info.name|to_css_class }}-datalist" 
+                        id="facet-{{ facet_info.name|to_css_class }}-input" 
+                        autocomplete="off" 
+                        placeholder="Type to search"
+                    />
+                    <datalist id="facet-{{ facet_info.name|to_css_class }}-datalist">
+                        {% for facet_value in facet_info.results %}
+                            {% if not facet_value.selected %}
+                                <option 
+                                    data-item="facet-{{ facet_info.name|to_css_class }}-item-{{loop.index0}}" 
+                                    value="{{ (facet_value.label | string()) or "-" }}" />
+                            {% endif %}
+                        {% endfor %}
+                    </datalist>
+                </li>
+
+            </ul>
+
+            <script defer>
+                document.getElementById(
+                    "facet-{{ facet_info.name|to_css_class }}-input"
+                ).addEventListener(
+                    'input', 
+                    facetInputDebounce(onFacetInput("facet-{{ facet_info.name|to_css_class }}"), 200));
+
+                // TODO: Hide search input if list is empty
+            </script>
+
+        </div>
+    {% endfor %}
+</div>
