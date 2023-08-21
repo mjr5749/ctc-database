@@ -134,9 +134,9 @@ module.exports.schemaAllPuzzles = [
 const schemaSudokuPuzzlesTable = 
 `CREATE TABLE sudoku_puzzles(
     Id              INTEGER PRIMARY KEY,
+    "Puzzle Title"  TEXT,
     Date            TEXT,
     Solver          TEXT,
-    "Puzzle Title"  TEXT,
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
@@ -147,7 +147,7 @@ const schemaSudokuPuzzlesTable =
 const schemaSudokuPuzzlesMaterializedTable =
   `INSERT INTO sudoku_puzzles
   select
-    "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
+    "Id", "Puzzle Title", "Date", "Solver", "Setter", "Constraints", 
     "Video", "Video Length", "Video Length (Minutes)"
   from all_puzzles
   where "Super Category"='Sudoku'`;
@@ -163,10 +163,10 @@ module.exports.schemaSudokuPuzzles = [
 const schemaGasPuzzlesTable = 
 `CREATE TABLE gas_puzzles(
     Id              INTEGER PRIMARY KEY,
+    "Puzzle Title"  TEXT,
     Date            TEXT,
     "GAS Date"      TEXT,
     Solver          TEXT,
-    "Puzzle Title"  TEXT,
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
@@ -177,7 +177,7 @@ const schemaGasPuzzlesTable =
 const schemaGasPuzzlesMaterializedTable =
 `INSERT INTO gas_puzzles
 select
-  "Id", "Date", "GAS Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
+  "Id", "Puzzle Title", "Date", "GAS Date", "Solver", "Setter", "Constraints", 
   "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Sudoku' and "GAS Date" is not null`;
@@ -193,9 +193,9 @@ module.exports.schemaGasPuzzles = [
 const schemaNotGasPuzzlesTable = 
 `CREATE TABLE not_gas_puzzles(
   Id              INTEGER PRIMARY KEY,
+  "Puzzle Title"  TEXT,
   Date            TEXT,
   Solver          TEXT,
-  "Puzzle Title"  TEXT,
   Setter          TEXT,
   Constraints     TEXT,
   Video           TEXT,
@@ -206,7 +206,7 @@ const schemaNotGasPuzzlesTable =
 const schemaNotGasPuzzlesMaterializedTable =
 `INSERT INTO not_gas_puzzles
 select
-  "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
+  "Id", "Puzzle Title", "Date", "Solver", "Setter", "Constraints", 
   "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Sudoku' and "GAS Date" is null`;
@@ -222,10 +222,10 @@ module.exports.schemaNotGasPuzzles = [
 const schemaPencilPuzzlesTable = 
 `CREATE TABLE pencil_puzzles(
     Id              INTEGER PRIMARY KEY,
+    "Puzzle Title"  TEXT,
     Date            TEXT,
     Solver          TEXT,
     Type            TEXT,
-    "Puzzle Title"  TEXT,
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
@@ -236,7 +236,7 @@ const schemaPencilPuzzlesTable =
 const schemaPencilPuzzlesMaterializedTable =
 `INSERT INTO pencil_puzzles
 select
-  "Id", "Date", "Solver", "Type", "Puzzle Title", "Setter", "Constraints", 
+  "Id", "Puzzle Title", "Date", "Solver", "Type", "Setter", "Constraints", 
   "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Pencil Puzzles'`;
@@ -253,9 +253,9 @@ module.exports.schemaPencilPuzzles = [
 const schemaCrosswordPuzzlesTable = 
 `CREATE TABLE crossword_puzzles(
     Id              INTEGER PRIMARY KEY,
+    "Puzzle Title"  TEXT,
     Date            TEXT,
     Solver          TEXT,
-    "Puzzle Title"  TEXT,
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
@@ -266,7 +266,7 @@ const schemaCrosswordPuzzlesTable =
 const schemaCrosswordPuzzlesMaterializedTable =
 `INSERT INTO crossword_puzzles
 select
-  "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
+  "Id", "Puzzle Title", "Date", "Solver", "Setter", "Constraints", 
   "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Crossword'`;
