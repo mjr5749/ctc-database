@@ -113,12 +113,12 @@ select
   (select json_group_array(subtype) from puzzle_subtype where puzzle_id=pz.id group by puzzle_id) "Constraints",
   json_object(
     'alt',vid.title,
-    'caption',vid.title || ' (' || time(vid.length_seconds, 'unixepoch') || ')',
+    'caption',vid.title,
     'img_src', 'https://img.youtube.com/vi/' || vid.id|| '/mqdefault.jpg',
     'href',CASE ifnull(pz.video_offset, '') WHEN '' THEN vid.youtube_link ELSE vid.youtube_link || '&t=' || pz.video_offset END
   ) "Video",
   time(vid.length_seconds, 'unixepoch') "Video Length",
-  CAST (round(vid.length_seconds / 60.0) AS INTEGER) "Video Length (Minutes)"
+  CAST (ceiling(vid.length_seconds / 60.0) AS INTEGER) "Video Length (Minutes)"
 from puzzle pz
 inner join video vid on vid.id=pz.video_id
 where pz.super_category in ('Sudoku', 'Crossword', 'Pencil Puzzles')
@@ -138,6 +138,7 @@ const schemaSudokuPuzzlesTable =
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
+    "Video Length"  TEXT,
     "Video Length (Minutes)" INTEGER
   );`;
 
@@ -145,7 +146,7 @@ const schemaSudokuPuzzlesMaterializedTable =
   `INSERT INTO sudoku_puzzles
   select
     "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
-    "Video", "Video Length (Minutes)"
+    "Video", "Video Length", "Video Length (Minutes)"
   from all_puzzles
   where "Super Category"='Sudoku'`;
 
@@ -165,6 +166,7 @@ const schemaGasPuzzlesTable =
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
+    "Video Length"  TEXT,
     "Video Length (Minutes)" INTEGER
   );`;
 
@@ -172,7 +174,7 @@ const schemaGasPuzzlesMaterializedTable =
 `INSERT INTO gas_puzzles
 select
   "Id", "Date", "GAS Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
-  "Video", "Video Length (Minutes)"
+  "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Sudoku' and "GAS Date" is not null`;
 
@@ -192,6 +194,7 @@ const schemaPencilPuzzlesTable =
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
+    "Video Length"  TEXT,
     "Video Length (Minutes)" INTEGER
   );`;
 
@@ -199,7 +202,7 @@ const schemaPencilPuzzlesMaterializedTable =
 `INSERT INTO pencil_puzzles
 select
   "Id", "Date", "Solver", "Type", "Puzzle Title", "Setter", "Constraints", 
-  "Video", "Video Length (Minutes)"
+  "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Pencil Puzzles'`;
 
@@ -219,6 +222,7 @@ const schemaCrosswordPuzzlesTable =
     Setter          TEXT,
     Constraints     TEXT,
     Video           TEXT,
+    "Video Length"  TEXT,
     "Video Length (Minutes)" INTEGER
   );`;
 
@@ -226,7 +230,7 @@ const schemaCrosswordPuzzlesMaterializedTable =
 `INSERT INTO crossword_puzzles
 select
   "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
-  "Video", "Video Length (Minutes)"
+  "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Crossword'`;
 

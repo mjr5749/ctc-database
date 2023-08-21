@@ -231,7 +231,13 @@ sheets.spreadsheets.values.get({
                             }
                         });
                     } else {
-                        console.log("WARN: Unable to determine video id for " + record[COL_LINK_YT]);
+                        var url = record[COL_LINK_YT];
+                        if(url.includes("/shorts/")){
+                            // Ignore this URL -- we are intentionally ignoring video shorts right now.
+                        }
+                        else {
+                            console.log("WARN: Unable to determine video id for " + record[COL_LINK_YT]);
+                        }
                     }  
                 });
 
