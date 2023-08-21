@@ -42,7 +42,7 @@
     {% for facet_info in facet_results.values() %}
         <div class="facet-info facet-{{ database|to_css_class }}-{{ table|to_css_class }}-{{ facet_info.name|to_css_class }}" id="facet-{{ facet_info.name|to_css_class }}" data-column="{{ facet_info.name }}">
             <p class="facet-info-name">
-                <strong>{{ facet_info.name }}{% if facet_info.type != "column" %} ({{ facet_info.type }}){% endif %}
+                <strong>{{ facet_info.name }}{% if facet_info.type != "column" and facet_info.type != "array" %} ({{ facet_info.type }}){% endif %}
                     <span class="facet-info-total">{% if facet_info.truncated %}&gt;{% endif %}{{ facet_info.results|length }}</span>
                 </strong>
                 {% if facet_info.hideable %}

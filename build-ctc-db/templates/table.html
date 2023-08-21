@@ -131,12 +131,6 @@
 </div>
 {% endif %}
 
-{% if query.sql and allow_execute_sql %}
-    <p><a class="not-underlined" title="{{ query.sql }}" href="{{ urls.database(database) }}?{{ {'sql': query.sql}|urlencode|safe }}{% if query.params %}&amp;{{ query.params|urlencode|safe }}{% endif %}">&#x270e; <span class="underlined">View and edit SQL</span></a></p>
-{% endif %}
-
-<p class="export-links">This data as {% for name, url in renderers.items() %}<a href="{{ url }}">{{ name }}</a>{{ ", " if not loop.last }}{% endfor %}{% if display_rows %}, <a href="{{ url_csv }}">CSV</a> (<a href="#export">advanced</a>){% endif %}</p>
-
 {% if suggested_facets %}
     {% include "_suggested_facets.html" %}
 {% endif %}
@@ -157,7 +151,8 @@
 
 {% if display_rows %}
     <div id="export" class="advanced-export">
-        <h3>Advanced export</h3>
+        <h3>Advanced export and query</h3>
+        <p>This data as {% for name, url in renderers.items() %}<a href="{{ url }}">{{ name }}</a>{{ ", " if not loop.last }}{% endfor %}{% if display_rows %}, <a href="{{ url_csv }}">CSV</a>{% endif %}</p>
         <p>JSON shape:
             <a href="{{ renderers['json'] }}">default</a>,
             <a href="{{ append_querystring(renderers['json'], '_shape=array') }}">array</a>,
@@ -177,6 +172,9 @@
                 {% endfor %}
             </p>
         </form>
+        {% if query.sql and allow_execute_sql %}
+            <p><a class="not-underlined" title="{{ query.sql }}" href="{{ urls.database(database) }}?{{ {'sql': query.sql}|urlencode|safe }}{% if query.params %}&amp;{{ query.params|urlencode|safe }}{% endif %}">&#x270e; <span class="underlined">View and edit SQL</span></a></p>
+        {% endif %}
     </div>
 {% endif %}
 
