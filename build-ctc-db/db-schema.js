@@ -129,6 +129,8 @@ module.exports.schemaAllPuzzles = [
     schemaAllPuzzlesView
 ]
 
+// Sudoku Puzzles ///////////////////////////////////
+
 const schemaSudokuPuzzlesTable = 
 `CREATE TABLE sudoku_puzzles(
     Id              INTEGER PRIMARY KEY,
@@ -155,6 +157,8 @@ module.exports.schemaSudokuPuzzles = [
     schemaSudokuPuzzlesTable,
     schemaSudokuPuzzlesMaterializedTable
 ];
+
+// GAS Puzzles ///////////////////////////////////
 
 const schemaGasPuzzlesTable = 
 `CREATE TABLE gas_puzzles(
@@ -184,6 +188,37 @@ module.exports.schemaGasPuzzles = [
     schemaGasPuzzlesMaterializedTable
 ];
 
+// Not GAS Puzzles ///////////////////////////////////
+
+const schemaNotGasPuzzlesTable = 
+`CREATE TABLE not_gas_puzzles(
+  Id              INTEGER PRIMARY KEY,
+  Date            TEXT,
+  Solver          TEXT,
+  "Puzzle Title"  TEXT,
+  Setter          TEXT,
+  Constraints     TEXT,
+  Video           TEXT,
+  "Video Length"  TEXT,
+  "Video Length (Minutes)" INTEGER
+);`;
+
+const schemaNotGasPuzzlesMaterializedTable =
+`INSERT INTO not_gas_puzzles
+select
+  "Id", "Date", "Solver", "Puzzle Title", "Setter", "Constraints", 
+  "Video", "Video Length", "Video Length (Minutes)"
+from all_puzzles
+where "Super Category"='Sudoku' and "GAS Date" is null`;
+
+module.exports.schemaNotGasPuzzles = [
+    'DROP TABLE IF EXISTS not_gas_puzzles',
+    schemaNotGasPuzzlesTable,
+    schemaNotGasPuzzlesMaterializedTable
+];
+
+// Pencil Puzzles ///////////////////////////////////
+
 const schemaPencilPuzzlesTable = 
 `CREATE TABLE pencil_puzzles(
     Id              INTEGER PRIMARY KEY,
@@ -212,6 +247,8 @@ module.exports.schemaPencilPuzzles = [
     schemaPencilPuzzlesMaterializedTable,
     'CREATE INDEX pencil_puzzles_type_idx1 on pencil_puzzles(Type)'
 ];
+
+// Crossword Puzzles ///////////////////////////////////
 
 const schemaCrosswordPuzzlesTable = 
 `CREATE TABLE crossword_puzzles(

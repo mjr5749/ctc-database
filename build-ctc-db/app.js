@@ -15,6 +15,7 @@ const {
     schemaAllPuzzles,
     schemaSudokuPuzzles,
     schemaGasPuzzles,
+    schemaNotGasPuzzles,
     schemaPencilPuzzles,
     schemaCrosswordPuzzles
 } = require("./db-schema");
@@ -251,6 +252,7 @@ sheets.spreadsheets.values.get({
                 // Create tables (materialized from views)
                 _.forEach(schemaSudokuPuzzles, stmt => db.run(stmt));
                 _.forEach(schemaGasPuzzles, stmt => db.run(stmt));
+                _.forEach(schemaNotGasPuzzles, stmt => db.run(stmt));
                 _.forEach(schemaPencilPuzzles, stmt => db.run(stmt));
                 _.forEach(schemaCrosswordPuzzles, stmt => db.run(stmt));
 

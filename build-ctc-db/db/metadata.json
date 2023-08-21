@@ -50,6 +50,20 @@
                     ],
                     "facet_size": 1200
                 },
+                "not_gas_puzzles": {
+                    "title": "🔢 Sudoku Puzzles (Minus GAS ⛽️)",
+                    "description_html": "Sudoku puzzle-solving videos from CTC <em>(excluding GAS puzzles)</em>.",
+                    "sort_desc": "Id",
+                    "units": {
+                        "Video Length (Minutes)": "minute"
+                    },
+                    "facets": [
+                        {"array": "Solver"},
+                        {"array": "Setter"},
+                        {"array": "Constraints"}
+                    ],
+                    "facet_size": 1200
+                },
                 "crossword_puzzles": {
                     "title": "🔠 Crossword Puzzles",
                     "description": "Crossword puzzle-solving videos from CTC.",
