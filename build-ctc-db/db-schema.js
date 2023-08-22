@@ -39,6 +39,7 @@ const schemaPuzzleTable =
     source          TEXT,
     collection      TEXT,
     gas_date        TEXT,
+    gas_num         TEXT,
     PRIMARY KEY(id),
     FOREIGN KEY(video_id) REFERENCES video(id)
 )`; // Note: STRICT schema is not supported by Datasette
@@ -101,6 +102,7 @@ select
   pz.super_category "Super Category",
   vid.date "Date",
   pz.gas_date "GAS Date",
+  pz.gas_num "GAS #",
   (select json_group_array(host) from video_host where video_id=vid.id group by video_id) "Solver",
   CASE ifnull(pz.title,'') 
     WHEN '' THEN 
@@ -166,6 +168,7 @@ const schemaGasPuzzlesTable =
     "Puzzle Title"  TEXT,
     Date            TEXT,
     "GAS Date"      TEXT,
+    "GAS #"         TEXT,
     Solver          TEXT,
     Setter          TEXT,
     Constraints     TEXT,
@@ -177,7 +180,7 @@ const schemaGasPuzzlesTable =
 const schemaGasPuzzlesMaterializedTable =
 `INSERT INTO gas_puzzles
 select
-  "Id", "Puzzle Title", "Date", "GAS Date", "Solver", "Setter", "Constraints", 
+  "Id", "Puzzle Title", "Date", "GAS Date", "GAS #", "Solver", "Setter", "Constraints", 
   "Video", "Video Length", "Video Length (Minutes)"
 from all_puzzles
 where "Super Category"='Sudoku' and "GAS Date" is not null`;

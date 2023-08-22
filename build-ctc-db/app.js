@@ -97,6 +97,7 @@ const COL_SOURCE = 'Source';
 // 48: Collection,CTC Discord: Daily Sudoku
 const COL_COLLECTION = 'Collection';
 // 49: GAS #,727
+const COL_GAS_NUMBER = 'GAS #';
 // 50: GAS/GAPP Date,3-Jun-2023
 const COL_GAS_DATE = 'GAS/GAPP Date';
 // 51: Sr. No.,4817
@@ -143,7 +144,7 @@ sheets.spreadsheets.values.get({
 
             const insertVideoStmt = db.prepare("INSERT INTO video VALUES (?,?,?,?,?,?,?)");
             const insertVideoHostStmt = db.prepare("INSERT INTO video_host VALUES(?,?)");
-            const insertPuzzleStmt = db.prepare("INSERT INTO puzzle VALUES(?,?,?,?,?,?,?,?,?)");
+            const insertPuzzleStmt = db.prepare("INSERT INTO puzzle VALUES(?,?,?,?,?,?,?,?,?,?)");
             const insertPuzzleSubtypeStmt = db.prepare("INSERT INTO puzzle_subtype VALUES(?,?)");
             const insertPuzzleSetterStmt = db.prepare("INSERT INTO puzzle_setter VALUES(?,?,?)");
             try {
@@ -212,7 +213,11 @@ sheets.spreadsheets.values.get({
                             ),
                             record[COL_SOURCE],
                             record[COL_COLLECTION],
-                            DateTime.fromFormat(record[COL_GAS_DATE], 'd-MMM-yyyy').toSQLDate()
+                            DateTime.fromFormat(record[COL_GAS_DATE], 'd-MMM-yyyy').toSQLDate(),
+                            (record[COL_GAS_NUMBER] ?
+                                record[COL_GAS_NUMBER] :
+                                null
+                            )
                         );
 
                         _.forEach(COLS_SUB_TYPE, col => {
