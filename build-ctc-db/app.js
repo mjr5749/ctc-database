@@ -261,6 +261,9 @@ sheets.spreadsheets.values.get({
                 _.forEach(schemaPencilPuzzles, stmt => db.run(stmt));
                 _.forEach(schemaCrosswordPuzzles, stmt => db.run(stmt));
 
+                // Database metadata
+                db.run("CREATE TABLE db_metadata AS SELECT datetime() 'last_updated_utc'");
+
             } finally {
                 insertVideoStmt.finalize();
                 insertVideoHostStmt.finalize();

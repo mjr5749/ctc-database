@@ -9,6 +9,7 @@ ARG DATASETTE_FORCE_HTTPS_URLS=1
 # Install Datasette plugins
 RUN ["datasette", "install", "datasette-json-html"]
 RUN ["datasette", "install", "datasette-hashed-urls"]
+RUN ["datasette", "install", "datasette-template-sql"]
 
 # Copy custom Datasette plugins
 COPY ./plugins /plugins
