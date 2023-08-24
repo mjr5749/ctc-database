@@ -20,10 +20,6 @@ const {
     schemaCrosswordPuzzles
 } = require("./db-schema");
 
-const CTC_CHANNEL_ID = 'UCC-UOdK8-mIjxBQm_ot1T-Q';
-var example = 'https://www.youtube.com/watch?v=_Fmp3dQYIss';
-var example2 = 'https://www.youtube.com/watch?v=AaC7ehqB3MI&t=30m55s';
-
 // Spreadsheet column schema w/ example values
 // 0: Count,5
 //     The number of puzzles in the video (each puzzle is a separate row)
@@ -262,6 +258,7 @@ sheets.spreadsheets.values.get({
                 _.forEach(schemaCrosswordPuzzles, stmt => db.run(stmt));
 
                 // Database metadata
+                db.run("DROP TABLE IF EXISTS db_metadata");
                 db.run("CREATE TABLE db_metadata AS SELECT datetime() 'last_updated_utc'");
 
             } finally {
