@@ -3,6 +3,8 @@
     "description_html": "This is a <strong>fan-created catalogue</strong> of all video <strong>content</strong> released by Cracking the Cryptic on its <a href='https://www.youtube.com/channel/UCC-UOdK8-mIjxBQm_ot1T-Q'><strong>Youtube</strong> channel</a> over the years.",
     "source": "Cracking the Cryptic Catalogue",
     "source_url": "https://docs.google.com/spreadsheets/d/1rVqAjm-l_Urjd3TNmIc3SmTmz_OlgSoBuhY7RPgiuRg/edit?usp=sharing",
+    "about" : "View on GitHub",
+    "about_url" : "https://github.com/mjr5749/ctc-database",
 
     "databases": {
         "ctc-catalogue": {

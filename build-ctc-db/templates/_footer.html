@@ -18,6 +18,5 @@ Powered by <a href="https://datasette.io/" title="Datasette v{{ datasette_versio
             <a href="{{ metadata.about_url }}">
         {% endif %}{{ metadata.about or metadata.about_url }}{% if metadata.about_url %}</a>{% endif %}
     {% endif %}
-    &middot;
-    Last updated (UTC): <em>{{sql("select last_updated_utc from db_metadata")[0]["last_updated_utc"]}}</em>
+    <p style="font-size:smaller">Last updated (UTC): <em>{{sql("select last_updated_utc from db_metadata")[0]["last_updated_utc"]}}</em></p>
 {% endif %}
