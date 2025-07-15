@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG DATASETTE_VERSION=0.64.3
+ARG DATASETTE_VERSION=0.65.1
 
 FROM datasetteproject/datasette:${DATASETTE_VERSION}
 
