@@ -14,13 +14,13 @@ This section describes the key details of how the application is deployed and ma
 ## Cloudflare Configuration (ctc-catalogue.com)
 
 ### DNS
-DNA `A` and `AAAA` records for `ctc-catalogue.com` are managed by Cloudflare, and traffic is proxied to the app on fly.io to provide caching.
+DNS `A` and `AAAA` records for `ctc-catalogue.com` are managed by Cloudflare, and traffic is proxied to the app on fly.io to provide caching.
 
 ### TLS
 TLS between Cloudflare and fly.io is set to `Full (Strict)`, which requires a trusted certificate on the fly.io app. Fly.io provisions the trusted certificate automatically after verifying ownership of the `ctc-catalogue.com` domain.
 
 ### Caching
-Cloudflare caches static assets (such as `.js` and `.css`) by default. Cloudflare adds response headers so that browser will cache these assets for 4 hours.
+Cloudflare caches static assets (such as `.js` and `.css`) by default. Cloudflare adds response headers so that browsers will cache these assets for 4 hours.
 
 Note that some Datasette assets do not use a unique URL that changes in a Datasette update. Therefore, a Datasette upgrade may require a cache purge on the CDN. This specifically effects the `table.js` asset.
 
