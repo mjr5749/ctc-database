@@ -2,7 +2,7 @@ const process = require('node:process');
 
 const {google} = require('googleapis');
 const {_} = require('lodash');
-const sqlite3 = require('sqlite3').verbose();
+const { DatabaseSync } = require('node:sqlite');
 const { DateTime } = require("luxon");
 
 const {
@@ -129,148 +129,140 @@ sheets.spreadsheets.values.get({
         // var row = _.zip(headerRow, value.data.values[4]);
         // _.forEach(row, (val, i) => console.log(i + ': ' + val));
 
-        const db = new sqlite3.Database('db/ctc-catalogue.db');
+        // Disable FK constraints so that they are not violated as we
+        // drop and recreate tables in an existing database
+        const db = new DatabaseSync('db/ctc-catalogue.db', {enableForeignKeyConstraints: false});
 
-        db.serialize( () => {
-            _.forEach(schemaVideo, stmt => db.run(stmt));
-            _.forEach(schemaVideoHost, stmt => db.run(stmt));
-            _.forEach(schemaPuzzle, stmt => db.run(stmt));
-            _.forEach(schemaPuzzleSubtype, stmt => db.run(stmt));
-            _.forEach(schemaPuzzleSetter, stmt => db.run(stmt));
+        _.forEach(schemaVideo, stmt => db.exec(stmt));
+        _.forEach(schemaVideoHost, stmt => db.exec(stmt));
+        _.forEach(schemaPuzzle, stmt => db.exec(stmt));
+        _.forEach(schemaPuzzleSubtype, stmt => db.exec(stmt));
+        _.forEach(schemaPuzzleSetter, stmt => db.exec(stmt));
 
-            const insertVideoStmt = db.prepare("INSERT INTO video VALUES (?,?,?,?,?,?,?)");
-            const insertVideoHostStmt = db.prepare("INSERT INTO video_host VALUES(?,?)");
-            const insertPuzzleStmt = db.prepare("INSERT INTO puzzle VALUES(?,?,?,?,?,?,?,?,?,?)");
-            const insertPuzzleSubtypeStmt = db.prepare("INSERT INTO puzzle_subtype VALUES(?,?)");
-            const insertPuzzleSetterStmt = db.prepare("INSERT INTO puzzle_setter VALUES(?,?,?)");
-            try {
-                // Map each spreadsheet row into an object, and determine if the record
-                // represents an "extra" puzzle or not.
-                var records = _.slice(value.data.values, 2).map( (row) => {
-                    var record = _.zipObject(headerRow, row);
-                    record.isExtraPuzzle = record[COL_VIDEO_TITLE].includes('[extra puzzle]');
-                    return record;
-                });
+        const insertVideoStmt = db.prepare("INSERT INTO video VALUES (?,?,?,?,?,?,?)");
+        const insertVideoHostStmt = db.prepare("INSERT INTO video_host VALUES(?,?)");
+        const insertPuzzleStmt = db.prepare("INSERT INTO puzzle VALUES(?,?,?,?,?,?,?,?,?,?)");
+        const insertPuzzleSubtypeStmt = db.prepare("INSERT INTO puzzle_subtype VALUES(?,?)");
+        const insertPuzzleSetterStmt = db.prepare("INSERT INTO puzzle_setter VALUES(?,?,?)");
 
-                // Sort the records so that all "extra" puzzles are at the end. This will
-                // ensure that the video entries they reference are created first.
-                records.sort( (a,b) => {
-                    if(a.isExtraPuzzle === b.isExtraPuzzle) return 0;
-                    return a.isExtraPuzzle ? 1 : -1;
-                });
-
-                // Create database entries for all videos and puzzles
-                records.forEach( record => {
-                    const videoIdRegex = /v=(?<id>[^&]*)/gm;
-                    var match = videoIdRegex.exec(record[COL_LINK_YT]);
-                    
-                    if(match) {
-                        var videoId = match.groups.id;
-
-                        // Only populate the video table for records that are not
-                        // extra puzzles.
-                        if(!record.isExtraPuzzle){
-                            insertVideoStmt.run(
-                                videoId,
-                                record[COL_VIDEO_TITLE],
-                                record[COL_VIDEO_TYPE],
-                                record[COL_SUPER_CATEGORY],
-                                DateTime.fromFormat(record[COL_DATE], 'd-MMM-yyyy').toSQLDate(),
-                                record[COL_VIDEO_LENGTH_SEC],
-                                record[COL_LINK_YT]
-                            );
-
-                            _.forEach(COLS_HOST, col => {
-                                var host = record[col];
-                                if(host) {
-                                    insertVideoHostStmt.run(videoId, host);
-                                }
-                            });
-                        }
-
-                        // Populate puzzle tables for all records -- for both "extra" puzzles
-                        // and the first puzzle in each video.
-                        var puzzleId = record[COL_SERIES_NUM];
-
-                        // Only extra puzzles are expected to have a video offset
-                        // in the YouTube link.
-                        const videoOffsetRegex = /t=(?<offset>[^&]*)/gm;
-                        var offsetMatch = videoOffsetRegex.exec(record[COL_LINK_YT]);
-
-                        insertPuzzleStmt.run(
-                            puzzleId,
-                            record[COL_PUZZLE_TITLE],
-                            record[COL_VIDEO_TYPE],
-                            record[COL_SUPER_CATEGORY],
-                            videoId,
-                            (record.isExtraPuzzle && offsetMatch ?
-                                offsetMatch.groups.offset :
-                                null // No video offset for first puzzle in video,
-                            ),
-                            record[COL_SOURCE],
-                            record[COL_COLLECTION],
-                            DateTime.fromFormat(record[COL_GAS_DATE], 'd-MMM-yyyy').toSQLDate(),
-                            (record[COL_GAS_NUMBER] ?
-                                record[COL_GAS_NUMBER] :
-                                null
-                            )
-                        );
-
-                        _.forEach(COLS_SUB_TYPE, col => {
-                            var subtype = record[col];
-                            if(subtype) {
-                                insertPuzzleSubtypeStmt.run(puzzleId, subtype);
-                            }
-                        });
-
-                        _.forEach(COLS_SETTER_AKA, col => {
-                            var setter = record[col.setter];
-                            if(setter) {
-                                insertPuzzleSetterStmt.run(
-                                    puzzleId, 
-                                    setter,
-                                    record[col.aka]);
-                            }
-                        });
-                    } else {
-                        var url = record[COL_LINK_YT];
-                        if(url.includes("/shorts/")){
-                            // Ignore this URL -- we are intentionally ignoring video shorts right now.
-                        }
-                        else {
-                            console.log("WARN: Unable to determine video id for " + record[COL_LINK_YT]);
-                        }
-                    }  
-                });
-
-                // Create schema indexes last, so the indexes don't need to be
-                // updated for every insert while populating the database
-                _.forEach(schemaIndexes, stmt => db.run(stmt));
-
-                // Create views
-                _.forEach(schemaAllPuzzles, stmt => db.run(stmt));
-
-                // Create tables (materialized from views)
-                _.forEach(schemaSudokuPuzzles, stmt => db.run(stmt));
-                _.forEach(schemaGasPuzzles, stmt => db.run(stmt));
-                _.forEach(schemaNotGasPuzzles, stmt => db.run(stmt));
-                _.forEach(schemaPencilPuzzles, stmt => db.run(stmt));
-                _.forEach(schemaCrosswordPuzzles, stmt => db.run(stmt));
-
-                // Database metadata
-                db.run("DROP TABLE IF EXISTS db_metadata");
-                db.run("CREATE TABLE db_metadata AS SELECT datetime() 'last_updated_utc'");
-
-            } finally {
-                insertVideoStmt.finalize();
-                insertVideoHostStmt.finalize();
-                insertPuzzleStmt.finalize();
-                insertPuzzleSubtypeStmt.finalize();
-                insertPuzzleSetterStmt.finalize();
-            }
+        // Map each spreadsheet row into an object, and determine if the record
+        // represents an "extra" puzzle or not.
+        var records = _.slice(value.data.values, 2).map( (row) => {
+            var record = _.zipObject(headerRow, row);
+            record.isExtraPuzzle = record[COL_VIDEO_TITLE].includes('[extra puzzle]');
+            return record;
         });
+
+        // Sort the records so that all "extra" puzzles are at the end. This will
+        // ensure that the video entries they reference are created first.
+        records.sort( (a,b) => {
+            if(a.isExtraPuzzle === b.isExtraPuzzle) return 0;
+            return a.isExtraPuzzle ? 1 : -1;
+        });
+
+        // Create database entries for all videos and puzzles
+        records.forEach( record => {
+            const videoIdRegex = /v=(?<id>[^&]*)/gm;
+            var match = videoIdRegex.exec(record[COL_LINK_YT]);
+            
+            if(match) {
+                var videoId = match.groups.id;
+
+                // Only populate the video table for records that are not
+                // extra puzzles.
+                if(!record.isExtraPuzzle){
+                    insertVideoStmt.run(
+                        videoId,
+                        record[COL_VIDEO_TITLE],
+                        record[COL_VIDEO_TYPE],
+                        record[COL_SUPER_CATEGORY],
+                        DateTime.fromFormat(record[COL_DATE], 'd-MMM-yyyy').toSQLDate(),
+                        record[COL_VIDEO_LENGTH_SEC],
+                        record[COL_LINK_YT]
+                    );
+
+                    _.forEach(COLS_HOST, col => {
+                        var host = record[col];
+                        if(host) {
+                            insertVideoHostStmt.run(videoId, host);
+                        }
+                    });
+                }
+
+                // Populate puzzle tables for all records -- for both "extra" puzzles
+                // and the first puzzle in each video.
+                var puzzleId = record[COL_SERIES_NUM];
+
+                // Only extra puzzles are expected to have a video offset
+                // in the YouTube link.
+                const videoOffsetRegex = /t=(?<offset>[^&]*)/gm;
+                var offsetMatch = videoOffsetRegex.exec(record[COL_LINK_YT]);
+
+                insertPuzzleStmt.run(
+                    puzzleId,
+                    record[COL_PUZZLE_TITLE],
+                    record[COL_VIDEO_TYPE],
+                    record[COL_SUPER_CATEGORY],
+                    videoId,
+                    (record.isExtraPuzzle && offsetMatch ?
+                        offsetMatch.groups.offset :
+                        null // No video offset for first puzzle in video,
+                    ),
+                    record[COL_SOURCE],
+                    record[COL_COLLECTION],
+                    DateTime.fromFormat(record[COL_GAS_DATE], 'd-MMM-yyyy').toSQLDate(),
+                    (record[COL_GAS_NUMBER] ?
+                        record[COL_GAS_NUMBER] :
+                        null
+                    )
+                );
+
+                _.forEach(COLS_SUB_TYPE, col => {
+                    var subtype = record[col];
+                    if(subtype) {
+                        insertPuzzleSubtypeStmt.run(puzzleId, subtype);
+                    }
+                });
+
+                _.forEach(COLS_SETTER_AKA, col => {
+                    var setter = record[col.setter];
+                    if(setter) {
+                        insertPuzzleSetterStmt.run(
+                            puzzleId, 
+                            setter,
+                            record[col.aka]);
+                    }
+                });
+            } else {
+                var url = record[COL_LINK_YT];
+                if(url.includes("/shorts/")){
+                    // Ignore this URL -- we are intentionally ignoring video shorts right now.
+                }
+                else {
+                    console.log("WARN: Unable to determine video id for " + record[COL_LINK_YT]);
+                }
+            }  
+        });
+
+        // Create schema indexes last, so the indexes don't need to be
+        // updated for every insert while populating the database
+        _.forEach(schemaIndexes, stmt => db.exec(stmt));
+
+        // Create views
+        _.forEach(schemaAllPuzzles, stmt => db.exec(stmt));
+
+        // Create tables (materialized from views)
+        _.forEach(schemaSudokuPuzzles, stmt => db.exec(stmt));
+        _.forEach(schemaGasPuzzles, stmt => db.exec(stmt));
+        _.forEach(schemaNotGasPuzzles, stmt => db.exec(stmt));
+        _.forEach(schemaPencilPuzzles, stmt => db.exec(stmt));
+        _.forEach(schemaCrosswordPuzzles, stmt => db.exec(stmt));
+
+        // Database metadata
+        db.exec("DROP TABLE IF EXISTS db_metadata");
+        db.exec("CREATE TABLE db_metadata AS SELECT datetime() 'last_updated_utc'");
+
         db.close();
-        
     },
     function onRejected(reason) {
         console.error('FATAL: Error returned from Google Sheets API: ' + reason);

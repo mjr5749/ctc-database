@@ -2,7 +2,6 @@
   "dependencies": {
     "googleapis": "^112.0.0",
     "lodash": "^4.17.21",
-    "luxon": "^3.3.0",
-    "sqlite3": "^5.1.6"
+    "luxon": "^3.3.0"
   }
 }
